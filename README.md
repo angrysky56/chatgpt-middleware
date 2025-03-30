@@ -12,7 +12,7 @@ A single integrated middleware solution that provides system access to ChatGPT C
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/chatgpt-middleware.git
+git clone https://github.com/angrysky56/chatgpt-middleware.git
 cd chatgpt-middleware
 
 # Run the automated setup script
