@@ -3,3 +3,4 @@ uvicorn[standard]
 python-dotenv
 pydantic
 sqlalchemy
+requests
