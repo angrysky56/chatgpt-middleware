@@ -32,10 +32,19 @@ class Config:
         "grep", "find", "wc", "date", "ps", "df"
     ]
     
-    # Path restrictions for high security
-    ALLOWED_PATHS = [
+    # Path restrictions for security levels
+    # These can be overridden by ALLOWED_PATHS in the .env file
+    DEFAULT_ALLOWED_PATHS = [
         "/home/ty/Repositories/ai_workspace"
     ]
+    
+    # Get allowed paths from environment variable if defined
+    ALLOWED_PATHS = os.getenv("ALLOWED_PATHS", None)
+    if ALLOWED_PATHS:
+        # Split by comma and strip whitespace
+        ALLOWED_PATHS = [path.strip() for path in ALLOWED_PATHS.split(",")]
+    else:
+        ALLOWED_PATHS = DEFAULT_ALLOWED_PATHS
     
     @classmethod
     def is_command_allowed(cls, command):

@@ -51,7 +51,8 @@ For ChatGPT to access your schema, you need to expose it online:
 
 ```bash
 # Install ngrok if you don't have it already
-npm install -g ngrok
+
+[NGROK, free for developers](https://ngrok.com/pricing)
 
 # Create a tunnel to your server
 ngrok http 8000
@@ -101,15 +102,29 @@ curl http://localhost:8000/cli?command=echo+hello -H "X-API-Key: your_api_key"
 
 ## 🔐 Security Settings
 
-Your middleware has configurable security levels in the `.env` file:
+Your middleware has configurable security settings in the `.env` file:
 
 ```
 API_KEY=your_generated_key
 SECURITY_LEVEL=medium  # Options: high, medium, low
+ALLOWED_PATHS=/path/to/dir1,/path/to/dir2
 ```
 
+### Security Levels
+
 - **High**: Only whitelisted commands and paths allowed
-- **Medium**: Dangerous commands blocked, basic path restrictions
+- **Medium**: Dangerous commands blocked, but allowed paths accessible
 - **Low**: Minimal restrictions (for development only)
 
-To change settings, edit the `.env` file or run `./setup.sh` again.
+### Allowed Paths
+
+You can specify which directories ChatGPT can access by setting the `ALLOWED_PATHS` variable. 
+Multiple directories should be comma-separated:
+
+```
+ALLOWED_PATHS=/home/user/documents,/home/user/projects,/tmp
+```
+
+During setup, you'll be prompted to configure these paths, or you can edit the `.env` file later.
+
+To change any settings, edit the `.env` file or run `./setup.sh` again.

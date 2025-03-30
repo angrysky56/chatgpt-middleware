@@ -46,6 +46,7 @@ echo -e "✅ All dependencies installed successfully"
 SECURITY_LEVEL="medium"
 AUTO_KEY=true
 CUSTOM_KEY=""
+ALLOWED_DIRS="$PWD"
 
 # Determine if this is running interactively
 if [ -t 0 ]; then
@@ -55,6 +56,7 @@ else
     echo -e "\n${YELLOW}Running in non-interactive mode. Using default settings:${NC}"
     echo -e "• Security Level: Medium"
     echo -e "• API Key: Auto-generated"
+    echo -e "• Allowed Paths: Current directory ($PWD)"
 fi
 
 # Configure security if interactive
@@ -73,6 +75,19 @@ if [ "$INTERACTIVE" = true ]; then
         3) SECURITY_LEVEL="low";;
         *) SECURITY_LEVEL="medium";;
     esac
+    
+    # Configure allowed paths
+    echo -e "\n${YELLOW}${BOLD}ALLOWED PATHS CONFIGURATION${NC}"
+    echo -e "----------------------"
+    echo -e "Enter directories that ChatGPT should be allowed to access (comma-separated)."
+    echo -e "Example: /home/user/documents,/home/user/downloads"
+    echo -e "Leave blank for default (current directory)."
+    
+    read -p "Allowed directories: " ALLOWED_DIRS
+    
+    if [ -z "$ALLOWED_DIRS" ]; then
+        ALLOWED_DIRS="$PWD"
+    fi
     
     # Configure API key if running interactively
     echo -e "\n${YELLOW}${BOLD}API KEY CONFIGURATION${NC}"
@@ -106,15 +121,24 @@ if [ -f .env ]; then
     # Update existing .env file
     sed -i "s/^API_KEY=.*$/API_KEY=$NEW_KEY/" .env
     sed -i "s/^SECURITY_LEVEL=.*$/SECURITY_LEVEL=$SECURITY_LEVEL/" .env
+    
+    # Update or add allowed paths
+    if grep -q "^ALLOWED_PATHS=" .env; then
+        sed -i "s|^ALLOWED_PATHS=.*$|ALLOWED_PATHS=$ALLOWED_DIRS|" .env
+    else
+        echo "ALLOWED_PATHS=$ALLOWED_DIRS" >> .env
+    fi
 else
     # Create new .env file
     echo "API_KEY=$NEW_KEY" > .env
     echo "SECURITY_LEVEL=$SECURITY_LEVEL" >> .env
+    echo "ALLOWED_PATHS=$ALLOWED_DIRS" >> .env
 fi
 
 echo -e "✅ Configuration updated:"
 echo -e "• Security level: ${BOLD}$SECURITY_LEVEL${NC}"
 echo -e "• API Key: ${BOLD}$NEW_KEY${NC}"
+echo -e "• Allowed paths: ${BOLD}$ALLOWED_DIRS${NC}"
 
 # Make helper scripts executable
 chmod +x gpt_config.py 2>/dev/null || true
