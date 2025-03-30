@@ -60,7 +60,34 @@ All functions use the same API key and security settings, so you only need to co
 
 ## 🛠️ Setting Up Your Custom GPT
 
-### Automated Setup (Recommended)
+### Direct OpenAPI Schema Import
+
+For the easiest setup that works with the browser-based Custom GPT editor:
+
+1. Generate the OpenAPI schema:
+   ```bash
+   ./gpt_config.py --format openapi
+   ```
+   
+   This creates an `openapi.json` file with properly formatted schema.
+
+2. Host this file at a public URL:
+   - Use ngrok: `ngrok http 8000` (then your schema will be at `https://your-ngrok-url/openapi.json`)
+   - Or upload to a web server
+
+3. In ChatGPT, create a new Custom GPT or edit an existing one
+
+4. In the "Configure" tab, go to "Actions"
+
+5. Click "Import from URL" and enter the URL where your schema is hosted
+
+6. For authentication, select "API Key" and enter:
+   - **Name**: X-API-Key
+   - **Value**: (Your API key from `.env` file)
+
+All endpoints (CLI, file read/write, and database operations) will be automatically imported and properly configured.
+
+### Alternative: Manual Configuration
 
 1. Start your server as shown above
 2. Run `./gpt_config.py`
@@ -144,6 +171,11 @@ Once configured, you can ask your Custom GPT to:
 - Verify your server is accessible from the internet
 - Check that the API key in your GPT matches the one in your `.env` file
 - Test your API locally: `curl http://localhost:8000/cli?command=echo+hello -H "X-API-Key: your_api_key"`
+
+### Root Origin or Schema Errors
+- Use the `./run_for_gpt.sh` script which handles these issues automatically
+- Make sure you import from the URL `https://localhost/openapi.json`
+- If using the schema on Custom GPT, remove any port numbers (e.g., use `https://localhost` not `https://localhost:8000`)
 
 ### Security Restrictions
 - If commands are being blocked, check your security level in `.env`

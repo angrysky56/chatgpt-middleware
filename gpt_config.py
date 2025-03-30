@@ -91,6 +91,12 @@ def validate_url(url):
 
 def generate_openapi_schema(base_url, api_key):
     """Generate an OpenAPI schema for Custom GPT actions"""
+    # For Custom GPT browser compatibility:
+    # 1. Strip the port number from the URL to avoid root origin errors
+    # 2. Ensure we have an empty schemas object in components
+    parsed_url = urlparse(base_url)
+    root_origin = f"{parsed_url.scheme}://{parsed_url.netloc.split(':')[0]}"
+    
     schema = {
         "openapi": "3.1.0",
         "info": {
@@ -100,7 +106,7 @@ def generate_openapi_schema(base_url, api_key):
         },
         "servers": [
             {
-                "url": base_url
+                "url": root_origin
             }
         ],
         "paths": {
@@ -236,6 +242,7 @@ def generate_openapi_schema(base_url, api_key):
             }
         },
         "components": {
+            "schemas": {},  # Always include empty schemas object to avoid browser editor errors
             "securitySchemes": {
                 "ApiKeyAuth": {
                     "type": "apiKey",
@@ -431,6 +438,7 @@ def get_ngrok_url():
         return None
     return None
 
+
 def main():
     parser = argparse.ArgumentParser(
         description="Generate configuration for ChatGPT Custom GPT actions",
@@ -499,6 +507,13 @@ Examples:
     # Output based on format
     if args.format == "openapi":
         print_openapi_schema(openapi_schema)
+        
+        # Automatically save to openapi.json for convenience
+        if not args.output:
+            with open("openapi.json", "w") as f:
+                json.dump(openapi_schema, f, indent=2)
+            print(f"\n{Colors.GREEN}✅ OpenAPI schema saved to openapi.json{Colors.END}")
+            print(f"{Colors.YELLOW}You can host this file and use 'Import from URL' in Custom GPT{Colors.END}")
     elif args.format == "actions":
         print(f"\n{Colors.BOLD}📝 API Endpoints{Colors.END}")
         for name, endpoint in config["individual_endpoints"].items():
@@ -546,6 +561,12 @@ Examples:
     # Final note
     print(f"\n{Colors.BOLD}💡 Tip:{Colors.END} For ChatGPT to access your server, it needs to be publicly accessible.")
     print(f"If testing locally, run ngrok: {Colors.BOLD}ngrok http 8000{Colors.END}")
+    
+    # Add note about schema browser compatibility
+    print(f"\n{Colors.BOLD}🔧 Custom GPT Setup{Colors.END}")
+    print(f"The generated schema is compatible with the browser-based Custom GPT editor.")
+    print(f"To import directly, save the schema to a file and host it at a public URL.")
+    print(f"Then click 'Import from URL' in the Custom GPT editor.")
 
 if __name__ == "__main__":
     main()

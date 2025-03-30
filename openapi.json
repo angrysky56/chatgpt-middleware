@@ -1,0 +1,166 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "System Access API",
+    "description": "API for system access via CLI, Filesystem, and Database",
+    "version": "v1"
+  },
+  "servers": [
+    {
+      "url": "http://localhost"
+    }
+  ],
+  "paths": {
+    "/cli": {
+      "post": {
+        "summary": "Execute a CLI command",
+        "operationId": "executeCommand",
+        "parameters": [
+          {
+            "name": "command",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Command to execute"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Command executed successfully"
+          }
+        }
+      }
+    },
+    "/read-file": {
+      "get": {
+        "summary": "Read a file",
+        "operationId": "readFile",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Path to the file"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File content"
+          }
+        }
+      }
+    },
+    "/write-file": {
+      "post": {
+        "summary": "Write to a file",
+        "operationId": "writeFile",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "description": "Path to the file"
+                  },
+                  "content": {
+                    "type": "string",
+                    "description": "Content to write"
+                  }
+                },
+                "required": [
+                  "path",
+                  "content"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "File written successfully"
+          }
+        }
+      }
+    },
+    "/items": {
+      "post": {
+        "summary": "Create a database item",
+        "operationId": "createItem",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Item name"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Item description"
+                  }
+                },
+                "required": [
+                  "name",
+                  "description"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Item created successfully"
+          }
+        }
+      }
+    },
+    "/items/{item_id}": {
+      "get": {
+        "summary": "Get a database item",
+        "operationId": "getItem",
+        "parameters": [
+          {
+            "name": "item_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Item ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Item details"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key"
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ]
+}
