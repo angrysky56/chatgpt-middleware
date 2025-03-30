@@ -1,6 +1,6 @@
 # ChatGPT System Access Toolkit
 
-A single integrated middleware solution that provides system access to ChatGPT Custom GPTs through three powerful tools:
+A simple middleware solution that gives ChatGPT access to your system through three powerful tools:
 
 1. **Command Line Interface (CLI)** - Run system commands
 2. **Filesystem Access** - Read and write files
@@ -8,7 +8,7 @@ A single integrated middleware solution that provides system access to ChatGPT C
 
 ## 🚀 Quick Start Guide
 
-### One-Command Setup
+### Setup
 
 ```bash
 # Clone the repository
@@ -19,12 +19,11 @@ cd chatgpt-middleware
 ./setup.sh
 ```
 
-The setup script handles everything:
-- Creates a Python virtual environment
+The setup script handles everything automatically:
+- Creates a virtual environment
 - Installs dependencies
 - Configures security settings
 - Generates an API key for you
-- Provides instructions for the next steps
 
 ### Starting the Server
 
@@ -34,167 +33,83 @@ source venv/bin/activate
 uvicorn main:app --reload
 ```
 
-**Your server will be running at: http://localhost:8000**
+Your middleware server is now running at: http://localhost:8000
 
-### Getting Your Custom GPT Configuration
+## 🔌 Connecting to ChatGPT
 
-After starting the server, run:
+### Step 1: Generate the OpenAPI Schema
 
 ```bash
-# Get your GPT configuration automatically
-./gpt_config.py
+./gpt_config.py --format openapi
 ```
 
-This will output a complete configuration that you can copy directly into your Custom GPT.
+This creates an `openapi.json` file with all endpoints properly configured.
 
-## 📦 What's in the Box
+### Step 2: Make Your Schema Available Online
 
-This toolkit provides ChatGPT with access to your system through a secure API:
-
-- **Run Commands**: Execute CLI commands on your system
-- **Read Files**: Access file contents
-- **Write Files**: Create or modify files
-- **Store Data**: Save and retrieve information in a SQLite database
-
-All functions use the same API key and security settings, so you only need to configure them once.
-
-## 🛠️ Setting Up Your Custom GPT
-
-### Direct OpenAPI Schema Import
-
-For the easiest setup that works with the browser-based Custom GPT editor:
-
-1. Generate the OpenAPI schema:
-   ```bash
-   ./gpt_config.py --format openapi
-   ```
-   
-   This creates an `openapi.json` file with properly formatted schema.
-
-2. Host this file at a public URL:
-   - Use ngrok: `ngrok http 8000` (then your schema will be at `https://your-ngrok-url/openapi.json`)
-   - Or upload to a web server
-
-3. In ChatGPT, create a new Custom GPT or edit an existing one
-
-4. In the "Configure" tab, go to "Actions"
-
-5. Click "Import from URL" and enter the URL where your schema is hosted
-
-6. For authentication, select "API Key" and enter:
-   - **Name**: X-API-Key
-   - **Value**: (Your API key from `.env` file)
-
-All endpoints (CLI, file read/write, and database operations) will be automatically imported and properly configured.
-
-### Alternative: Manual Configuration
-
-1. Start your server as shown above
-2. Run `./gpt_config.py`
-3. Copy the output
-4. Paste it into your Custom GPT's "Actions" section
-
-The configuration includes:
-- The correct URLs for all endpoints
-- Your API key pre-filled
-- Proper parameters for each function
-
-### What About Server URLs?
-
-Don't worry about server URLs - the configuration tool automatically detects the correct URL based on how you're running the server:
-
-- **Local testing**: Uses `http://localhost:8000`
-- **Network access**: Can use your computer's IP address
-- **Public access**: Can use ngrok or other tunneling services
-
-To use a public URL (for accessing from ChatGPT), run:
+For ChatGPT to access your schema, you need to expose it online:
 
 ```bash
-./gpt_config.py --url https://your-public-url.com
-```
+# Install ngrok if you don't have it already
+npm install -g ngrok
 
-## 🔐 Security
-
-Your server uses:
-
-- **API Key Authentication**: Secure access with a randomly generated key
-- **Configurable Security Levels**: Choose high/medium/low security based on your needs
-- **Path Restrictions**: Limit filesystem access to safe directories
-- **Command Filtering**: Block dangerous commands
-
-All these settings are configured in the `.env` file and can be changed through the setup script.
-
-## 🌐 Making Your Server Accessible to ChatGPT
-
-For ChatGPT to access your server, it needs to be available on the internet. You have three options:
-
-### Option 1: Ngrok (Easiest for Testing)
-
-```bash
-# Install ngrok if you don't have it
-npm install ngrok -g
-
-# Start a tunnel to your local server
+# Create a tunnel to your server
 ngrok http 8000
-
-# Then use the ngrok URL with the config tool
-./gpt_config.py --url https://your-ngrok-url.com
 ```
 
-### Option 2: Port Forwarding (Home Networks)
+This will give you a public URL like: `https://12ab34cd.ngrok.io`
 
-1. Configure your router to forward port 8000 to your computer
-2. Find your public IP address (search "what's my IP" online)
-3. Use `./gpt_config.py --url http://your-public-ip:8000`
+### Step 3: Set Up Custom GPT
 
-### Option 3: Cloud Deployment (Most Reliable)
+1. Go to ChatGPT and create a new Custom GPT or edit an existing one
+2. In the "Configure" tab, go to "Actions"
+3. Click "Import from URL" and enter: `https://your-ngrok-url/openapi.json`
+4. For authentication, select "API Key" and enter:
+   - **Name**: X-API-Key
+   - **Value**: Your API key (shown during setup)
 
-Deploy to a cloud provider like AWS, Digital Ocean, or Heroku.
+## 💡 Example Usage
 
-## 📚 Example Usage in ChatGPT
-
-Once configured, you can ask your Custom GPT to:
+Once connected, you can ask your Custom GPT to:
 
 - "Run the command 'ls -la' to list files"
-- "Read the file at /path/to/important-notes.txt"
-- "Create a file called project-ideas.txt with the following content: [your content]"
-- "Save this information to the database: Name: Project Alpha, Description: New AI initiative"
-- "Retrieve item #5 from the database"
+- "Read the file at /path/to/notes.txt"
+- "Create a file called ideas.txt with this content: [content]"
+- "Save this to the database: Name: Project X, Description: AI initiative"
+- "Get item #3 from the database"
 
 ## 🔧 Troubleshooting
 
-### Server Won't Start
-- Check if another process is using port 8000
-- Ensure you've activated the virtual environment: `source venv/bin/activate`
+### Common Issues
 
-### ChatGPT Can't Connect
-- Verify your server is accessible from the internet
-- Check that the API key in your GPT matches the one in your `.env` file
-- Test your API locally: `curl http://localhost:8000/cli?command=echo+hello -H "X-API-Key: your_api_key"`
+- **Server Issues**: Make sure your server is running with `uvicorn main:app --reload`
+- **Connection Issues**: Ensure ngrok is running and your URL is correct
+- **Schema Errors**: Run `./gpt_config.py --format openapi` to regenerate a fixed schema
+- **API Key Issues**: Check that the API key in your GPT matches the one in your `.env` file
 
-### Root Origin or Schema Errors
-- Use the `./run_for_gpt.sh` script which handles these issues automatically
-- Make sure you import from the URL `https://localhost/openapi.json`
-- If using the schema on Custom GPT, remove any port numbers (e.g., use `https://localhost` not `https://localhost:8000`)
+### Testing Your Setup
 
-### Security Restrictions
-- If commands are being blocked, check your security level in `.env`
-- For filesystem operations, ensure paths are within allowed directories
-
-### Need More Help?
-Run `./gpt_config.py --help` for additional configuration options.
-
-## 🛡️ Advanced Configuration
-
-For advanced users who need more control:
+You can test your API with curl:
 
 ```bash
-# Edit your .env file to customize settings
-nano .env
+# Get your API key
+grep API_KEY .env
 
-# Contents:
-API_KEY=your_secure_key
+# Test a command
+curl http://localhost:8000/cli?command=echo+hello -H "X-API-Key: your_api_key"
+```
+
+## 🔐 Security Settings
+
+Your middleware has configurable security levels in the `.env` file:
+
+```
+API_KEY=your_generated_key
 SECURITY_LEVEL=medium  # Options: high, medium, low
 ```
 
-You can edit this file directly or run `./setup.sh` again to reconfigure.
+- **High**: Only whitelisted commands and paths allowed
+- **Medium**: Dangerous commands blocked, basic path restrictions
+- **Low**: Minimal restrictions (for development only)
+
+To change settings, edit the `.env` file or run `./setup.sh` again.
