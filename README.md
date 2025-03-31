@@ -56,6 +56,7 @@ Once the server is running:
 ## 🛠️ What Your Custom GPT Can Do (Currently mostly untested)
 
 ![alt text](image.png)
+![alt text](image-2.png)
 
 Once connected, your Custom GPT can:
 
