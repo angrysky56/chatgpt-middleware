@@ -1,130 +1,117 @@
-# ChatGPT System Access Toolkit
+# ChatGPT-Middleware System Commander
 
-A simple middleware solution that gives ChatGPT access to your system through three powerful tools:
+CLI, File System, SQLite Access for OpenAI Custom GPTs- Simple To Use, maybe has issues, AI generated, I am not a coder, use at own risk!!!
+
+A streamlined platform agnostic middleware solution that gives ChatGPT Custom GPTs access to your system through three basic tools:
 
 1. **Command Line Interface (CLI)** - Run system commands
 2. **Filesystem Access** - Read and write files
 3. **SQLite Database** - Store and retrieve data
 
-## 🚀 Quick Start Guide
 
-### Setup
+Requires NGROK free dev account, select your platform and install:
+
+https://dashboard.ngrok.com/get-started/setup/linux
+
+Then:
+
+## ⚡ One-Click Setup & Run
 
 ```bash
-# Clone the repository
+# Clone the repository 
 git clone https://github.com/angrysky56/chatgpt-middleware.git
 cd chatgpt-middleware
 
-# Run the automated setup script
-./setup.sh
+# Run the all-in-one script (setup, ngrok, and server)
+python run.py
 ```
 
-The setup script handles everything automatically:
+- You will be prompted to add or remove allowed directories
+
+- Creates a page at http://localhost:8000/setup-gpt with clear instructions, local api key and url generation for your Custom GPT.
+
+## Important: Select the url from option 2, option 1 is broken currently
+
+![alt text](image-1.png)
+
+That's it! The script handles everything:
+
 - Creates a virtual environment
 - Installs dependencies
-- Configures security settings
-- Generates an API key for you
+- Generates a secure API key
+- Starts the server
+- Connects with ngrok (if available)
+- Updates the OpenAPI schema
 
-### Starting the Server
+## 🔌 Setting Up Your Custom GPT
 
-```bash
-# After running setup.sh
-source venv/bin/activate
-uvicorn main:app --reload
+Once the server is running:
+
+1. Visit the setup page: http://localhost:8000/setup-gpt
+2. Follow the instructions to create your Custom GPT
+3. Import the OpenAPI schema from your ngrok URL
+
+> ⚠️ **Important**: ChatGPT requires a publicly accessible URL for custom GPT Actions to work. The ngrok URL is automatically detected and configured in your OpenAPI schema.
+
+## 🛠️ What Your Custom GPT Can Do (Currently mostly untested)
+
+![alt text](image.png)
+
+Once connected, your Custom GPT can:
+
+- **Run commands**: "List all files in the current directory"
+- **Read files**: "Show me the content of config.json"
+- **Write files**: "Create a file called notes.txt with this content..."
+- **Store data**: "Save this information to the database"
+
+## 🔒 Security
+
+- The system runs with "medium" security by default
+- Access is restricted to your current directory
+- A unique API key is generated automatically
+- Dangerous system commands are blocked
+
+## 🔧 For Developers
+
+## 📋 Manual Configuration
+
+You can edit the `.env` file to change:
+
+- Your API key
+- Security level (high/medium/low)
+- Allowed file paths
+
+### Manual Path Configuration
+
+By default, the middleware restricts file access to the current working directory for security.
+To allow access to additional directories, add them to the `.env` file:
+
+```env
+# For Windows (use backslashes or escaped backslashes)
+ALLOWED_PATHS=C:\Users\username\Documents,C:\Projects
+
+# For macOS/Linux (use forward slashes)
+ALLOWED_PATHS=/home/username/Documents,/var/www/html
 ```
 
-Your middleware server is now running at: http://localhost:8000
+Leave `ALLOWED_PATHS` empty to use only the current directory.
 
-## 🔌 Connecting to ChatGPT
-
-### Step 1: Generate the OpenAPI Schema
+## 🛠️ Command Line Options
 
 ```bash
-./gpt_config.py --format openapi
+# Start without ngrok
+python run.py --no-ngrok
 ```
 
-This creates an `openapi.json` file with all endpoints properly configured.
-
-### Step 2: Make Your Schema Available Online
-
-For ChatGPT to access your schema, you need to expose it online:
+If you prefer to run components separately:
 
 ```bash
-# Install ngrok if you don't have it already
+# Start the server only
+python -m uvicorn main:app --reload --port 8000
 
-[NGROK, free for developers](https://ngrok.com/pricing)
-
-# Create a tunnel to your server
+# Start ngrok in another terminal
 ngrok http 8000
+
+# Update the schema with the ngrok URL
+python update_schema.py
 ```
-
-This will give you a public URL like: `https://12ab34cd.ngrok.io`
-
-### Step 3: Set Up Custom GPT
-
-1. Go to ChatGPT and create a new Custom GPT or edit an existing one
-2. In the "Configure" tab, go to "Actions"
-3. Click "Import from URL" and enter: `https://your-ngrok-url/openapi.json`
-4. For authentication, select "API Key" and enter:
-   - **Name**: X-API-Key
-   - **Value**: Your API key (shown during setup)
-
-## 💡 Example Usage
-
-Once connected, you can ask your Custom GPT to:
-
-- "Run the command 'ls -la' to list files"
-- "Read the file at /path/to/notes.txt"
-- "Create a file called ideas.txt with this content: [content]"
-- "Save this to the database: Name: Project X, Description: AI initiative"
-- "Get item #3 from the database"
-
-## 🔧 Troubleshooting
-
-### Common Issues
-
-- **Server Issues**: Make sure your server is running with `uvicorn main:app --reload`
-- **Connection Issues**: Ensure ngrok is running and your URL is correct
-- **Schema Errors**: Run `./gpt_config.py --format openapi` to regenerate a fixed schema
-- **API Key Issues**: Check that the API key in your GPT matches the one in your `.env` file
-
-### Testing Your Setup
-
-You can test your API with curl:
-
-```bash
-# Get your API key
-grep API_KEY .env
-
-# Test a command
-curl http://localhost:8000/cli?command=echo+hello -H "X-API-Key: your_api_key"
-```
-
-## 🔐 Security Settings
-
-Your middleware has configurable security settings in the `.env` file:
-
-```
-API_KEY=your_generated_key
-SECURITY_LEVEL=medium  # Options: high, medium, low
-ALLOWED_PATHS=/path/to/dir1,/path/to/dir2
-```
-
-### Security Levels
-
-- **High**: Only whitelisted commands and paths allowed
-- **Medium**: Dangerous commands blocked, but allowed paths accessible
-- **Low**: Minimal restrictions (for development only)
-
-### Allowed Paths
-
-You can specify which directories ChatGPT can access by setting the `ALLOWED_PATHS` variable. 
-Multiple directories should be comma-separated:
-
-```
-ALLOWED_PATHS=/home/user/documents,/home/user/projects,/tmp
-```
-
-During setup, you'll be prompted to configure these paths, or you can edit the `.env` file later.
-
-To change any settings, edit the `.env` file or run `./setup.sh` again.

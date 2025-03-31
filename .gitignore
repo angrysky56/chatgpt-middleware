@@ -1,95 +1,21 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
+# Virtual environment
 venv/
-ENV/
-env/
-env.bak/
-venv.bak/
-
-# Environment and Secrets
-.env
-.env.*
-*.key
-*.pem
-*.cert
-*.password
-secrets/
-api_keys.txt
-config.local.py
+__pycache__/
 
 # Database files
 *.sqlite3
-*.sqlite
 *.db
-*.db-shm
-*.db-wal
 
-# Logs and temporary files
+# Logs
 *.log
-logs/
-log/
-tmp/
-temp/
-.tmp/
-*.tmp
-*.bak
-*.swp
-*.swo
 
-# IDE and Editor files
-.idea/
+# Environment variables
+.env
+
+# IDE files
 .vscode/
-*.sublime-project
-*.sublime-workspace
-.project
-.pydevproject
-.settings/
-*.code-workspace
+.idea/
+
+# OS-specific files
 .DS_Store
 Thumbs.db
-.directory
-*.~
-
-# Generated documentation
-docs/_build/
-site/
-
-# Testing and coverage
-.coverage
-htmlcov/
-.pytest_cache/
-.tox/
-nosetests.xml
-coverage.xml
-*.cover
-
-# Docker
-.docker/
-docker-compose.override.yml
-
-# Security and personal data
-credentials.json
-token.json
-access_tokens.txt
-*.token
-*.secret

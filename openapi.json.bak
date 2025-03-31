@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "https://373a-2600-6c67-7400-3b7-419e-fee9-9b5f-6f51.ngrok-free.app",
+      "url": "https://api.example.com",
       "description": "Dynamic server endpoint"
     }
   ],

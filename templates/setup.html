@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT System Access Setup</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #0066cc;
+            margin-bottom: 10px;
+        }
+        h2 {
+            color: #0066cc;
+            margin-top: 30px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .highlight {
+            background-color: #f0f7ff;
+            border-left: 4px solid #0066cc;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        code {
+            background-color: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+        }
+        .step {
+            margin-bottom: 25px;
+        }
+        .api-key {
+            font-weight: bold;
+            color: #d14;
+        }
+        .url {
+            font-weight: bold;
+            color: #0066cc;
+        }
+        .note {
+            background-color: #fffaed;
+            border-left: 4px solid #e8b339;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #efffef;
+            border-left: 4px solid #2ecc71;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #0052a3;
+        }
+        .schema-box {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔌 ChatGPT System Access Setup</h1>
+    <p>Follow these steps to connect your Custom GPT to this server.</p>
+
+    <div class="highlight">
+        <p><strong>Server Status:</strong> <span style="color: #2ecc71;">✅ Running</span></p>
+        <p><strong>Local URL:</strong> <span class="url">{{ local_url }}</span></p>
+        {% if public_url %}
+        <p><strong>Public URL:</strong> <span class="url">{{ public_url }}</span></p>
+        {% else %}
+        <p><strong>Network URL:</strong> <span class="url">{{ network_url }}</span></p>
+        <p class="note">❗ To make this accessible to ChatGPT, run <code>ngrok http 8000</code> in a separate terminal window. ChatGPT requires a publicly accessible URL for Actions to work properly.</p>
+        {% endif %}
+    </div>
+
+    <h2>Step 1: Create a Custom GPT</h2>
+    <div class="step">
+        <p>Go to <a href="https://chat.openai.com/gpts/editor" target="_blank">ChatGPT's GPT Editor</a> and create a new GPT:</p>
+        <ol>
+            <li>Click "Create a GPT" or "Create new"</li>
+            <li>Give your GPT a name (like "System Commander")</li>
+            <li>Add a description (e.g., "Access my system through CLI, files and database")</li>
+        </ol>
+    </div>
+
+    <h2>Step 2: Configure Actions</h2>
+    <div class="step">
+        <p>In the "Configure" tab:</p>
+        <ol>
+            <li>Scroll down to the "Actions" section</li>
+            <li>Click "Add action"</li>
+            <li>Select Authentication</li>
+            <li>For Authentication, select "API Key"</li>
+            <li>API Key Value: <code class="api-key">{{ api_key }}</code></li>
+            <li>Select: Auth Type: Custom</li>
+            <li>API Key Name: <code>X-API-Key</code></li>
+        </ol>
+    </div>
+
+    <h2>Step 3: Add the Schema</h2>
+    <div class="step">
+        <p>Choose one of these methods to add the OpenAPI schema:</p>
+        
+        <div class="highlight">
+            <p><strong>Option 1: Direct Import - OpenAPI Schema (RECOMMENDED)</strong></p>
+            {% if public_url %}
+            <p>Click "Import from URL" and paste: <code class="url">{{ public_url }}/openapi.json</code></p>
+            <p class="success">✅ This is the standard OpenAPI schema with all features</p>
+            <p class="note">⚠️ If you encounter a "Could not find a valid URL in `servers`" error, try Option 2 below.</p>
+            {% else %}
+            <p class="note">❗ This option requires public URL access with ngrok</p>
+            {% endif %}
+        </div>
+        
+        <div class="highlight">
+            <p><strong>Option 2: Alternative Schema URL</strong></p>
+            {% if public_url %}
+            <p>Click "Import from URL" and paste: <code class="url">{{ public_url }}/schema.json</code></p>
+            <p class="note">Both schema files contain identical content. Try this option if Option 1 doesn't work.</p>
+            {% else %}
+            <p class="note">❗ This option requires public URL access with ngrok</p>
+            {% endif %}
+        </div>
+        
+        <div class="highlight">
+            <p><strong>Option 3: Manual Copy/Paste</strong></p>
+            <p>Copy the schema below and paste it into the "Schema" field:</p>
+            <div class="schema-box">
+                <pre><code id="schema-json">{{ schema_json }}</code></pre>
+            </div>
+            <button onclick="copySchema()">Copy Schema</button>
+        </div>
+    </div>
+
+    <h2>Step 4: Save and Test</h2>
+    <div class="step">
+        <p>Click "Save" to complete the setup.</p>
+        <p>Test your GPT with these commands:</p>
+        <ul>
+            <li>"Run the command 'echo hello world'"</li>
+            <li>"List files in the current directory"</li>
+            <li>"Create a file called test.txt with content 'This is a test file'"</li>
+            <li>"Read the file test.txt"</li>
+        </ul>
+        <div class="success">
+            <p>✅ Your system access is now configured!</p>
+            <p><strong>Important:</strong> Keep this server running whenever you want to use your GPT.</p>
+        </div>
+        
+        <div class="highlight">
+            <p><strong>Having trouble?</strong> Check out our <a href="{{ public_url }}/chatgpt-guide" target="_blank">Troubleshooting Guide</a> for common issues and solutions.</p>
+        </div>
+    </div>
+
+    <script>
+        function copySchema() {
+            const schema = document.getElementById("schema-json");
+            const textArea = document.createElement("textarea");
+            textArea.value = schema.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand("copy");
+            document.body.removeChild(textArea);
+            alert("Schema copied to clipboard!");
+        }
+    </script>
+</body>
+</html>
